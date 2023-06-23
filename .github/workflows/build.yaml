@@ -1,5 +1,6 @@
 name: Build OpenWrt ethernet drivers
-
+permissions:
+  contents: write
 # on: [push, pull_request]
 on:
   push:
@@ -94,7 +95,19 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: ${{ env.KMOD_VERSION }}
+        
+    - name: Upload build artifacts to cloud
+      run: |
+        mkdir -p ${{ github.workspace }}/artifact
+        for ipk in `find . -name '*.ipk'`; do
+          mv $ipk ${{ github.workspace }}/artifact
+        done
+        cd artifact && md5sum *.ipk > md5sum.txt
+        cd ..
 
+        wget -O release.txt $RELEASE_URL
+        echo -e "\nUpdated at $(date)" >> release.txt
+        
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
       env:
