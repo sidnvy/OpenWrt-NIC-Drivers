@@ -55,13 +55,9 @@ jobs:
 
         cd $sdk
         echo 'CONFIG_PACKAGE_kmod-r8125=m' > .config
-        echo 'CONFIG_PACKAGE_kmod-r8152=m' >> .config
-        echo 'CONFIG_PACKAGE_kmod-igb-intel=m' >> .config
         make defconfig
         
         make package/r8125/compile -j$(nproc) || make package/r8125/compile -j1 V=sc || exit 0
-        make package/r8152/compile -j$(nproc) || make package/r8152/compile -j1 V=sc || exit 0
-        make package/kmod-igb-intel/compile -j$(nproc) || make package/kmod-igb-intel/compile -j1 V=sc || exit 0
 
         # cp file to artifact
         cd ${{ github.workspace }}
@@ -71,13 +67,6 @@ jobs:
           cp $ipk ${{ github.workspace }}/artifact
         done
 
-        for ipk in `find . -name 'kmod-r8152*.ipk'`; do
-          cp $ipk ${{ github.workspace }}/artifact
-        done
-
-        for ipk in `find . -name 'kmod-igb-intel*.ipk'`; do
-          cp $ipk ${{ github.workspace }}/artifact
-        done
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
